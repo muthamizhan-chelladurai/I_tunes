@@ -60,7 +60,6 @@ public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.
         private TextView item_track;
         private TextView item_collection, item_coll_price, item_publishedDate;
         private ImageView album_image_url;
-
         
         public AlbumSearchResultHolder(@NonNull View itemView) {
             super(itemView);
