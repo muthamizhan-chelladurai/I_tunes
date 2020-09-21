@@ -1,9 +1,12 @@
 package com.bmtt.itunes.View;
 
 
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,11 +17,15 @@ import com.bmtt.itunes.R;
 import com.bmtt.itunes.Model.Result;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.AlbumSearchResultHolder> {
     private List<Result> results = new ArrayList<>();
+    MainActivity main;
 
     @NonNull
     @Override
@@ -33,14 +40,54 @@ public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.
     @Override
     public void onBindViewHolder(@NonNull AlbumSearchResultHolder holder, int position) {
 
-        holder.item_artist.setText(results.get(position).getArtistName());
-        holder.item_track.setText(results.get(position).getTrackName());
-        holder.item_collection.setText(results.get(position).getCollectionName());
-        holder.item_coll_price.setText(String.valueOf(results.get(position).getCollectionPrice()));
-        holder.item_publishedDate.setText(results.get(position).getReleaseDate().substring(0, 10));
+        Result singleArtist = results.get(position);
+        String artistName = "<b>" + "Artist Name:" + "</b> " + singleArtist.getArtistName();
+        holder.item_artist.setText(Html.fromHtml(artistName));
+
+        String trackName = "<b>" + "Track Name:" + "</b> " + singleArtist.getTrackName();
+        holder.item_track.setText(Html.fromHtml(trackName));
+
+        String collectName = "<b>" + "Colltn Name:" + "</b> " + singleArtist.getCollectionName();
+        holder.item_collection.setText(Html.fromHtml(collectName));
+
+
+        String collectPrice = "<b>" + "Colltn Price:" + "</b> " + main.getResources().getString(R.string.Rs) + String.valueOf(singleArtist.getCollectionPrice());
+
+        holder.item_coll_price.setText(Html.fromHtml(collectPrice));
+
+        String date_s = String.valueOf((singleArtist.getReleaseDate().substring(0, 10)));
+
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try {
+            date = dt.parse(date_s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        // *** same for the format String below
+        SimpleDateFormat dtf = new SimpleDateFormat("dd-MM-yyyy");
+
+
+        String publishDate = "<b>" + "Release Dt :" + "</b> " + dtf.format(date);
+        holder.item_publishedDate.setText(Html.fromHtml(publishDate));
+
+
+
         Glide.with(holder.itemView)
-                .load(results.get(position).getArtworkUrl100())
+                .load(singleArtist.getArtworkUrl100())
                 .into(holder.album_image_url);
+
+        holder.select_album_cb.setOnCheckedChangeListener(null);
+        holder.select_album_cb.setChecked(singleArtist.isChecked());
+
+        holder.select_album_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+
+                singleArtist.setChecked(isChecked);
+
+            }
+        });
 
     }
 
@@ -49,8 +96,9 @@ public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.
         return results.size();
     }
 
-    public void setResults(List<Result> results) {
+    public void setResults(List<Result> results, MainActivity main) {
         this.results = results;
+        this.main = main;
         notifyDataSetChanged();
     }
 
@@ -60,7 +108,8 @@ public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.
         private TextView item_track;
         private TextView item_collection, item_coll_price, item_publishedDate;
         private ImageView album_image_url;
-        
+        private CheckBox select_album_cb;
+
         public AlbumSearchResultHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -70,6 +119,7 @@ public class AlbumSearchAdapter extends RecyclerView.Adapter<AlbumSearchAdapter.
             item_coll_price = itemView.findViewById(R.id.item_coll_price);
             item_publishedDate = itemView.findViewById(R.id.item_publishedDate);
             album_image_url = itemView.findViewById(R.id.album_image_url);
+            select_album_cb = itemView.findViewById(R.id.select_album_cb);
         }
     }
 

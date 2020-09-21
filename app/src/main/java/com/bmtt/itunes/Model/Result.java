@@ -24,6 +24,16 @@ public class Result {
     @Expose
     private String artworkUrl100;
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
+    private boolean isChecked;
+
     public String getArtistName() {
         return artistName;
     }
